@@ -17,10 +17,8 @@ app.use('/game', GameRoute)
 
 
 app.all("*", (req, res, next) => {
-    // next(AppError("page not found", 404))
-    res.json({
-        'hello'
-    })
+    next(AppError("page not found", 404))
+   
 });
 
 
