@@ -1,32 +1,39 @@
-const User = require('../models/User');
-const generateToken = require('../utils/generateToken')
-const AppError = require('../utils/AppError');
-
+const User = require("../models/User");
+const AppError = require("../utils/AppError");
 
 exports.register = async (req, res, next) => {
-    
-    try {
-        const {username, password, email, firstName, lastName, age} = req.body
-        // if (!username) {
-        //     next(new AppError('invalid Username'))
-        // }
-        // if (!password) {
-        //     next(new AppError('invalid Password'))
-        // }
-        // if (!email) {
-        //     next(new AppError('invalid Email'))
-        // }
-        // if (!firstName) {
-        //     next(new AppError('required FirstName'))
-        // }
-        // if (!lastName) {
-        //     next(new AppError('invalid LastName'))
-            const newUser = await User.create(req.body);
-            newUser.password = undefined;
-            const token = generateToken(newUser);
-            res.status(201).json({ token });
-            console.log(newUser);
-    } catch (error) {
-        next(new AppError(`${error.message}`));
+  const { username, password, email, firstName, lastName, age } = req.body;
+
+  const userFromDbExistChecker = await User.findOne({
+    username: username,
+  }).exec();
+
+  console.log(userFromDbExistChecker);
+  try {
+    // if (!password) {
+    //     next(new AppError('invalid Password'))
+    // }
+    // if (!email) {
+    //     next(new AppError('invalid Email'))
+    // }
+    // if (!firstName) {
+    //     next(new AppError('required FirstName'))
+    // }
+    // if (!lastName) {
+    //     next(new AppError('invalid LastName'))
+    const newUser = await User.create(req.body);
+    res.status(201).json({
+      success: true,
+      data: {
+        username,
+        password,
+      },
+    });
+  } catch (error) {
+    if (userFromDbExistChecker.username == username) {
+        next(new AppError('username exist'));
+        
     }
+    
+  }
 };
