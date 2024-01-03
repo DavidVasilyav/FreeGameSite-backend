@@ -17,15 +17,14 @@ const generateToken = require('../utils/generateToken')
 
 exports.login = async (req, res, next) => {
     try {
-
         const { username, password } = req.body;
         if(!username && !password) 
-         next(new AppError("please provied username and paswword!", 400));
+         next(new AppError("please provide username and password!", 400));
         const user = await User.findOne({ username });
         if(!user) return next(new AppError("User does not exist", 403))
 
         if(!(await user.checkPass(password)))
-            return next(new AppError("Worng password try again!", 403))
+            return next(new AppError("Wrong password try again!", 403))
             
         const token = generateToken(user);
         res.status(200).json({
@@ -40,7 +39,7 @@ exports.login = async (req, res, next) => {
             })
 
     } catch (error) {
-        console.log(123);
+        console.log(error);
         next(new AppError(`${error.message}`));
     };
 }

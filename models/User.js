@@ -22,7 +22,7 @@ const newUserSchema = new Schema({
     unique: [true, "Email is already exists"],
     validate: {
       validator: validateEmail,
-      message: "Email is invalid",
+      message: props => `${props.value} Email is invalid`,
     },
   },
   firstName: { type: String, required: [true, "Please provide First Name"] },

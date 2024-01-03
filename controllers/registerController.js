@@ -4,24 +4,19 @@ const AppError = require("../utils/AppError");
 exports.register = async (req, res, next) => {
   const { username, password, email, firstName, lastName, age } = req.body;
 
-  const userFromDbExistChecker = await User.findOne({
-    username: username,
-  }).exec();
-
-  console.log(userFromDbExistChecker);
+  const userFromDbExistChecker = await User.findOne({ $or: [{username: username}, {email: email}]}).exec();
+  if (userFromDbExistChecker) {
+    if (userFromDbExistChecker.username === username) {
+      console.log('user');
+      return next(new AppError(`username exist`));
+    }
+    if (userFromDbExistChecker.email === email)
+    console.log('email');
+      return next(new AppError(`email exist`));
+  }
   try {
-    // if (!password) {
-    //     next(new AppError('invalid Password'))
-    // }
-    // if (!email) {
-    //     next(new AppError('invalid Email'))
-    // }
-    // if (!firstName) {
-    //     next(new AppError('required FirstName'))
-    // }
-    // if (!lastName) {
-    //     next(new AppError('invalid LastName'))
     const newUser = await User.create(req.body);
+    console.log(newUser);
     res.status(201).json({
       success: true,
       data: {
@@ -30,10 +25,9 @@ exports.register = async (req, res, next) => {
       },
     });
   } catch (error) {
-    if (userFromDbExistChecker.username == username) {
-        next(new AppError('username exist'));
-        
+    if(error.errors.email) {
+      return next(new AppError('email is invalid'));
     }
-    
+    return next(new AppError(error));
   }
 };
